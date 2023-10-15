@@ -1,0 +1,41 @@
+{% extends "base/base.html" %}
+
+{% block title %}Log In{% endblock %}
+{% block content %}
+    <div class="row d-flex justify-content-center align-items-center">
+        <div class="card rounded-3" style="width: 28rem">
+            <div class="card-body">
+                <h3 class="card-title mb-3">Log In</h3>
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+                    {{ form.csrf_token }}
+                    <fieldset class="d-grid">
+                        {% for field in form if field.widget.input_type != 'hidden' and field.name != "submit" %}
+                            <div class="form-group mb-2">
+                                {{ field.label(class="form-control-label") }}
+                                {% if field.errors %}
+                                    {{ field(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in field.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ field(class="form-control my-1") }}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        {{ form.submit(class="btn btn-outline-info my-3") }}
+                    </fieldset>
+                </form>
+                <hr>
+                <div class="text-muted">
+                    <p class="mb-0">
+                        <i class="fst-italic">Not registered?</i>
+                        <a class="decoration-none link-info" href="{{ url_for('auth.sign_up') }}">Sign Up</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

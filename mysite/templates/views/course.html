@@ -1,0 +1,21 @@
+{% extends "base/base.html" %}
+{% block title %}Course {{ course.name }}{% endblock %}
+{% block content %}
+    <h3>Course: {{ course.name }}</h3>
+    {% if course.assessments %}
+        {% for assessment in course.assessments %}
+            <div class="card my-4">
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="link-info decoration-none"
+                               href="{{ url_for('views.assessment', course_name=course.name, assessment_number=assessment.number) }}">
+               Assessment {{ assessment.number }}: {{ assessment.name }}
+                            </a>
+                        </h4>
+                    </div>
+                </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">This course currently has no assessments</p>
+    {% endif %}
+{% endblock %}

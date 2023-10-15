@@ -1,0 +1,27 @@
+{% extends "base/base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+    {% if current_user.is_authenticated %}
+        <h3>Welcome {{ current_user.email }}!</h3>
+        {% if current_user.courses %}
+            {% for course in current_user.courses %}
+                <div class="card my-4">
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="link-info decoration-none"
+                               href="{{ url_for('views.course', course_name=course.name) }}">
+                                {{ course.name }}
+                            </a>
+                        </h4>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            You are not enrolled in any courses
+        {% endif %}
+    {% else %}
+        <h3>Welcome {{ current_user.email }}!</h3>
+        User not logged in.
+        <a class="link-info decoration-none" href="{{ url_for("auth.login") }}">Login</a>
+    {% endif %}
+{% endblock %}

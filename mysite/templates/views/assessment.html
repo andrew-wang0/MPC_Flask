@@ -1,0 +1,160 @@
+{% extends "base/base.html" %}
+{% block title %}Assessment {{ assessment.name }}{% endblock %}
+{% block content %}
+    <div class="mb-5">
+        <h3 class="mb-4">Assessment {{ assessment.number }}: {{ assessment.name }}</h3>
+        {% if question_contexts %}
+            {% for q_context in question_contexts %}
+                <form id="question_form{{ q_context.question_query.question_number }}" method="POST" action="">
+                    {{ q_context.question_form.csrf_token }}
+                    <div class="my-4">
+                        <div class="card {% if q_context.is_correct %} border-5 border-bottom border-success{% elif q_context.guesses_left <= 0 %} bg-disabled{% endif %}"
+                             id="card_{{ q_context.question_query.question_number }}">
+                            <div class="card-header">
+                                Question {{ q_context.question_query.question_number }}
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    {{ q_context.question_form.hidden_tag() }}
+                                    <div class="form-label mb-3 user-select-none">
+                                        <pre>{{ q_context.question_query.question_text }}</pre>
+                                        <p class="feedback mb-0 mt-3"
+                                           id="feedback_{{ q_context.question_query.question_number }}">
+                                            {% autoescape false %}
+                                            {{ q_context.feedback }}
+                                            {% endautoescape %}
+                                        </p>
+                                    </div>
+                                    <div class="row">
+                                        <div class="d-inline-flex">
+                                            {% if q_context.guesses_left <= 0 %}
+                                                {{ q_context.question_form.answer(class='answer-field col-9', disabled=True) }}
+                                                {{ q_context.question_form.submit(class='btn btn-outline-info', disabled=True) }}
+                                            {% else %}
+                                                {{ q_context.question_form.answer(class='answer-field col-9', id='input_' ~ q_context.question_query.question_number, maxlength=q_context.max_input_length) }}
+                                                {{ q_context.question_form.submit(class='btn btn-outline-info', id='submit_' ~ q_context.question_query.question_number) }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if not q_context.is_correct %}
+                                    <small class="text-muted fst-italic m-0"
+                                           id="guesses_left_{{ q_context.question_query.question_number }}">
+                                        Guesses left: {{ q_context.guesses_left }}
+                                    </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">
+                This Assessment currently has no questions
+            </p>
+
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <div class="card rounded-0 p-3 fixed-progress-bar flex-row">
+        <div class="col-11 my-auto progress">
+            <div class="progress-bar bg-success" role="progressbar" id="progress_correct"
+                 style="width: {{ 100 * num_correct / num_questions }}%"></div>
+            <div class="progress-bar bg-disabled-dark" role="progressbar" id="progress_disabled"
+                 style="width: {{ 100 * num_disabled / num_questions }}%"></div>
+        </div>
+        <div class="col-1 text-center">
+            <p class="text-right m-0 fw-bold" id="score">
+                {{ num_correct ~ "/" ~ num_questions }}
+            </p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript">
+        // JavaScript code to handle scroll events
+        window.addEventListener('scroll', function () {
+            const footer = document.querySelector('footer');
+            const progressBar = document.querySelector('.fixed-progress-bar');
+
+            // Calculate the distance from the top of the footer to the top of the viewport
+            const footerOffset = footer.offsetTop;
+            // Calculate the current scroll position
+            const scrollPosition = window.scrollY;
+
+            // Check if the user has scrolled far enough to bring the footer to the bottom of the page
+            if (scrollPosition + window.innerHeight >= footerOffset) {
+                // If the footer is at the bottom, position the progress bar above the footer
+                progressBar.style.bottom = `${window.innerHeight - (footerOffset - scrollPosition)}px`;
+            } else {
+                // If the footer is not at the bottom, fix the progress bar at the bottom of the screen
+                progressBar.style.bottom = '0';
+            }
+        });
+
+        document.querySelectorAll('[id^="question_form"]').forEach(form => {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                            const question_number = data["question_number"]
+                            const feedbackElement = document.getElementById(`feedback_${question_number}`);
+                            const guessesLeftElement = document.getElementById(`guesses_left_${question_number}`);
+                            const cardElement = document.getElementById(`card_${question_number}`);
+                            const answerInputElement = document.getElementById(`input_${question_number}`)
+                            const answerSubmitElement = document.getElementById(`submit_${question_number}`)
+                            const progressCorrectElement = document.getElementById(`progress_correct`)
+                            const progressDisabledElement = document.getElementById(`progress_disabled`)
+                            const scoreElement = document.getElementById(`score`)
+
+                            feedbackElement.innerHTML = data["feedback"];
+                            guessesLeftElement.innerHTML = "Guesses Left: " + data["guesses_left"];
+
+                            if (data["is_correct"]) {
+                                guessesLeftElement.remove()
+
+                                cardElement.classList.add("border-5", "border-bottom", "border-success")
+
+                                parseFloat(data["num_correct"])
+                                parseFloat(data["num_disabled"])
+                                parseFloat(data["num_questions"])
+
+                                progressCorrectElement.style.width = data["num_correct"] * 100 / data["num_questions"] + "%"
+                                scoreElement.textContent = "" + data["num_correct"] + "/" + data["num_questions"]
+
+                            } else if (data["guesses_left"] <= 0) {
+                                answerInputElement.disabled = true
+                                answerSubmitElement.disabled = true
+
+                                cardElement.classList.add("bg-disabled")
+                                progressDisabledElement.style.width = data["num_disabled"] * 100 / data["num_questions"] + "%"
+
+                            }
+                        }
+                    )
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+        });
+
+        document.querySelectorAll('.answer-field').forEach(answerField => {
+            answerField.addEventListener('paste', function (event) {
+                event.preventDefault();
+            });
+            answerField.addEventListener('drop', function (event) {
+                event.preventDefault();
+            });
+        });
+
+    </script>
+{% endblock %}

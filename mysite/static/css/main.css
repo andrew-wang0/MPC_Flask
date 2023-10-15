@@ -1,0 +1,84 @@
+body {
+    background-color: #ececec;
+}
+
+.nav-link-darken:hover {
+    color: #363636 !important;
+}
+
+.decoration-none {
+    text-decoration: none;
+}
+
+.link-info {
+    color: #3084a0 !important
+}
+
+.link-info:focus, .link-info:hover{
+    color: #48c4ec !important
+}
+
+.btn-outline-info {
+    --bs-btn-color: #25657a;
+    --bs-btn-border-color: #25657a;
+    --bs-btn-hover-color: #ffffff;
+    --bs-btn-hover-bg: #25657a;
+    --bs-btn-hover-border-color: #25657a;
+    --bs-btn-focus-shadow-rgb: 13, 202, 240;
+    --bs-btn-active-color: #000;
+    --bs-btn-active-bg: #25657a;
+    --bs-btn-active-border-color: #25657a;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #25657a;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #25657a;
+    --bs-gradient: none
+}
+
+.bg-dark {
+    background-color: #520829 !important
+}
+
+.question-input {
+    width: 24rem;
+}
+
+
+.bg-disabled {
+    background-color: #eaeaea;
+}
+
+.bg-disabled-dark {
+    background-color: #9f9f9f;
+}
+
+.feedback {
+    letter-spacing: 2px;
+    font-family: "Lucida Console", sans-serif;
+}
+
+.card-footer {
+    margin-top: 20px;
+    background-color: #cbcbcb
+}
+
+.fixed-progress-bar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 2000; /* Adjust the z-index as needed */
+}
+
+pre {
+    font-size: 110%;
+    white-space: pre-wrap;
+}
+
+f-correct {
+    color: green;
+}
+
+f-incorrect {
+    color: #cccccc;
+    text-decoration: line-through;
+}

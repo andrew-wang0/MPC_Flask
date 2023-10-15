@@ -1,0 +1,20 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+    <div>
+        <div class="mb-4">
+            <h3>Error 500: Internal Server Error</h3>
+            <p class="text-muted">There's a bug on the loose!</p>
+        </div>
+        <p>
+            This is an error on our end, please report this issue by contacting
+            <a class="link-info decoration-none" href="mailto:awwang3@uci.edu">awwang3@uci.edu</a>
+            or through
+            <a class="link-info decoration-none" href="#">Feedback</a>
+        </p>
+        <p>
+            Go back
+            <a class="link-info decoration-none" href="{{ url_for('views.index') }}">home</a>
+        </p>
+    </div>
+{% endblock %}

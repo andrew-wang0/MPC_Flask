@@ -1,0 +1,13 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+    <div>
+        <h2>Admin View</h2>
+        <p>{{ current_user.email }}</p>
+        <br>
+        <div class="list-group">
+            <a class="list-group-item" href="{{ url_for('views.index') }}">Exit Admin View</a>
+            <a class="list-group-item" href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </div>
+{% endblock %}
